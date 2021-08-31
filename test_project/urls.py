@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
     path('api-auth/', include('rest_framework.urls')),
 
     path('api/v1/files/', include('file_sharing.urls')),
