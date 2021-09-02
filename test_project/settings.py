@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    
+
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.facebook',
 
@@ -93,7 +93,7 @@ DATABASES = {
         'NAME': 'test_db',
         'USER': 'testuser',
         'PASSWORD': 'devpass',
-        'HOST': '127.0.0.1',
+        'HOST': 'localhost',
         'PORT': 5432
     }
 }
