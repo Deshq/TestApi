@@ -9,12 +9,13 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=devpass
       - POSTGRES_DB=dev_db
-  
+    container_name: "test_db_dev"
+    
   web:
     build:
       context: ./
       dockerfile: Dockerfile
-    command: python manage.py runserver 0.0.0.0:8000
+    command: pipenv run python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/usr/src/app/
     depends_on:
@@ -22,7 +23,8 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - ./.env.dev   
+      - ./.env.dev  
+    container_name: "test_web_dev" 
 
 volumes:
   postgres_data:

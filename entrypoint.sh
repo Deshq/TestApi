@@ -1,7 +1,7 @@
 #! /bin/bash
 
-python manage.py makemigrations --no-input
+pipenv run python manage.py makemigrations --no-input
 
-python manage.py migrate --no-input
+pipenv run python manage.py migrate --no-input
 
 exec "$@"
