@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from file_sharing import serializers
 from file_sharing.serializers import FileDetailSerializer, FileGetUrlSerializer, FileListSerializer
 from file_sharing.models import File
-from file_sharing.permissions import IsOwnerOrReadOnly
+from file_sharing.permissions import IsOwnerOrReadOnly, IsSuperUser
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthenticatedOrReadOnly
 from django.db.models import F
 from rest_framework.filters import SearchFilter
@@ -88,7 +88,7 @@ class AdminDataView(generics.ListAPIView):
     """Returns a queryset as a serialized list"""
 
     queryset = File._base_manager.all()
-    permission_classes = (IsAdminUser, )
+    permission_classes = (IsSuperUser, )
 
     def get_queryset(self):
         # add complex lookup here
