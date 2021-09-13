@@ -13,6 +13,8 @@ boto3 = "*"
 minio = "*"
 
 [dev-packages]
+pytest-django = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.9"

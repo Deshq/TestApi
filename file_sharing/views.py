@@ -1,11 +1,9 @@
 from datetime import datetime
-from django.db.models.aggregates import Avg, Count, Sum
+from django.db.models.aggregates import Count, Sum
 from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from file_sharing import serializers
 from file_sharing.serializers import FileDetailSerializer, FileGetUrlSerializer, FileListSerializer
 from file_sharing.models import File
 from file_sharing.permissions import IsOwnerOrReadOnly, IsSuperUser
@@ -37,7 +35,7 @@ class FileDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     serializer_class = FileDetailSerializer
     queryset = File.objects.all()
-    permission_classes = (IsOwnerOrReadOnly, IsAuthenticatedOrReadOnly) 
+    permission_classes = (IsOwnerOrReadOnly, IsAuthenticated) 
 
 class FileGetAPIView(generics.RetrieveAPIView):
     """Getting a link to download a file"""
