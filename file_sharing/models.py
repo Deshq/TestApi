@@ -24,6 +24,13 @@ class FileManager(models.Manager):
             .filter(end_at__gt=datetime.now())\
             .filter(in_archive=False)
 
+    def get_expired_files(self):
+        return self.get_queryset()\
+            .filter(end_at__gt=datetime.now() - timedelta(days=365))
+
+    def delete_expired_files(self):
+        File.objects.get_expired_files().delete()
+        
 class File(models.Model):
     
     title = models.CharField(verbose_name='Title', max_length=255)  
