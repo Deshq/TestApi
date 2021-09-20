@@ -5,33 +5,62 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile.prod
-    command: gunicorn test_project.wsgi:application --bind 0.0.0.0:8000 
     expose:
       - 8000
+    command: ["gunicorn", "-b", "0.0.0.0:8000", "-w", "2", "-k", "uvicorn.workers.UvicornWorker", "test_project.asgi:application"]
     volumes:
       - static_volume:/home/app/web/static
-      - media_volume:/home/app/web/media
     env_file:
       - ./.env.prod
     depends_on:
       - db
+      - minio
+
   db:
     image: postgres:12.0-alpine
     volumes:
       - prod_postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./.env.prod.db
+
+  minio:
+    container_name: minio-prod
+    image: minio/minio:latest
+    command: server --console-address :9001 /data
+    env_file:
+      - ./.env.prod.minio
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - minio_data:/data
+      - minio_conf:/root/.minio
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      apk add nc &&
+      while ! nc -z minio 9000; do echo 'Wait minio to startup...' && sleep 0.1; done; sleep 5 &&
+      /usr/bin/mc config host add myminio http://minio:9000 prod_minio prod_minio_admin;
+      /usr/bin/mc mb myminio/my-prod-bucket;
+      /usr/bin/mc policy download myminio/my-prod-bucket;
+      exit 0;
+      " 
+
   nginx:
     build: ./docker/nginx
     ports:
       - "80:80"
     volumes:
       - static_volume:/home/app/web/static
-      - media_volume:/home/app/web/media
     depends_on:
       - web
       
 volumes:
   prod_postgres_data:
   static_volume:
-  media_volume:
+  minio_data:
+  minio_conf:

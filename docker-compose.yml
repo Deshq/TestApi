@@ -3,6 +3,7 @@ version: "3"
 services: 
   postgresdb:
     image: postgres:12.0-alpine
+    restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment: 
@@ -10,7 +11,34 @@ services:
       - POSTGRES_PASSWORD=devpass
       - POSTGRES_DB=dev_db
     container_name: "test_db_dev"
-    
+
+  minio:
+    container_name: minio
+    image: minio/minio:latest
+    command: server --console-address :9001 /data
+    environment: 
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: minio123
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - ./minio/data/:/data
+      - ./minio/conf/:/root/.minio
+
+  createbuckets:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      apk add nc &&
+      while ! nc -z minio 9000; do echo 'Wait minio to startup...' && sleep 0.1; done; sleep 5 &&
+      /usr/bin/mc config host add myminio http://minio:9000 minio minio123;
+      /usr/bin/mc mb myminio/my-local-bucket;
+      /usr/bin/mc policy download myminio/my-local-bucket;
+      exit 0;
+      " 
   web:
     build:
       context: ./
@@ -20,6 +48,7 @@ services:
       - .:/usr/src/app/
     depends_on:
       - postgresdb
+      - minio
     ports:
       - "8000:8000"
     env_file:
