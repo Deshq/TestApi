@@ -40,8 +40,7 @@ class FileDetailSerializer(serializers.ModelSerializer):
         title = value
         qs = File.objects.filter(title__iexact=title)
         if qs.exists():
-            raise serializers.ValidationError("This title already exists")
-        return title     
+            raise serializers.ValidationError("This title already exists")          
+        return title 
 
 
-   

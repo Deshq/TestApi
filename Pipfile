@@ -11,6 +11,8 @@ django-allauth = "*"
 gunicorn = "*"
 boto3 = "*"
 minio = "*"
+django-storages = "*"
+uvicorn = "*"
 
 [dev-packages]
 pytest-django = "*"
