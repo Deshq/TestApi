@@ -11,7 +11,6 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated, IsAuthentic
 from django.db.models import F
 from rest_framework.filters import SearchFilter
 
-
 # Create your views here.
 
 class FileCreateView(generics.CreateAPIView):
@@ -47,18 +46,21 @@ class FileGetAPIView(generics.RetrieveAPIView):
     def get(self, request, pk, format=None): 
 
         qs = File.objects.filter(id = pk)\
-            .filter(end_at__gt=datetime.now())                   
+            .filter(end_at__gt=datetime.now())\
+            .filter(in_archive=False)   
+                           
         qs.update(countOfdownloads=F('countOfdownloads') + 1)
 
         serializer = FileGetUrlSerializer(qs, many=True, context= {'request': request})
             
         if serializer.data:
             return Response({ 'status' : True, 'message' : 
-                'File url', 'file' : serializer.data})     
-
+                'File url', 'file' : serializer.data})   
+         
         raise NotFound(detail="Error 404, page not found", code=404)
 
 class StatisticsUserProfileView(generics.ListAPIView):
+    """Returns top 10 user files by count of downloading"""
 
     serializer_class = FileListSerializer
     queryset = File.objects.all()
@@ -75,7 +77,6 @@ class StatisticsUserProfileView(generics.ListAPIView):
         
         if serializer.data:
             return Response({'Top 10 downloads file in profile ': serializer.data})
-
         raise NotFound(detail="Error 404, page not found", code=404)
 
     def get(self, request, *args, **kwargs):
