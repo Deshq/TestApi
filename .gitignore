@@ -26,6 +26,7 @@ share/python-wheels/
 *.egg
 MANIFEST
 media/
+minio/
 
 # Installer logs
 pip-log.txt
@@ -69,7 +70,9 @@ __pypackages__/
 
 
 # Environments
-.env
+.env.*
+.env.prod.*
+
 .venv
 env/
 venv/
